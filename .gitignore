@@ -1,1 +1,5 @@
-.data-00000-of-00001
+djangoDemo/app_demo/predict/models/model.ckpt-45000.data-00000-of-00001
+djangoDemo/app_demo/predict/models/model.ckpt-45000.index
+djangoDemo/app_demo/predict/models/model.ckpt-45000.meta
+
+/__pycache__/

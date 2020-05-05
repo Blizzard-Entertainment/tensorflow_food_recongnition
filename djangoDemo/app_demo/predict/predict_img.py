@@ -13,7 +13,6 @@ import glob
 import app_demo.predict.slim.nets.inception_v3 as inception_v3
 import tensorflow.contrib.slim as slim
 from app_demo.predict.create_tf_record import *
-from app_demo.utils.img_handle import *
 
 def load_graph(models_path,labels_filename,labels_nums, data_format):
     [batch_size, resize_height, resize_width, depths] = data_format

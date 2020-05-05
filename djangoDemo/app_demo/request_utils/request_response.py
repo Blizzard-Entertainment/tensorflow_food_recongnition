@@ -1,6 +1,5 @@
 from app_demo.request_utils.common import *
 from app_demo.models import *
-from app_demo.utils.img_handle import *
 import base64
 import os
 import re
