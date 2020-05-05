@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.pythonPath": "E:\\Anaconda\\Anaconda3\\envs\\tensorflow\\python.exe"
+	}
+}
