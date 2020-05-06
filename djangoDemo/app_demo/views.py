@@ -23,7 +23,6 @@ def request_test(request):
         return JsonResponse(query_img_predict(request))
     return None
 
-
 def request_img_predict(request):
     if request.method == 'POST':
         return JsonResponse(query_img_predict(request))

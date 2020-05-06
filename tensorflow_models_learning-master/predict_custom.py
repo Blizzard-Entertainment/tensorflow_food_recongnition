@@ -48,10 +48,12 @@ def  predict_list_image(models_path,image_dir,labels_filename,labels_nums, data_
         print("{} is: pre labels:{},name:{} score: {}".format(image_path,pre_label,labels[pre_label], max_score))
     sess.close()
 
-def predict_single_image(models_path,image_path,labels_filename,labels_nums, data_format):
+def predict_single_image(models_path,image_path,labels_filename,label_id_filename, data_format):
     [batch_size, resize_height, resize_width, depths] = data_format
 
     labels = np.loadtxt(labels_filename, str, delimiter='\t', encoding='utf-8')
+    labels_id = np.loadtxt(label_id_filename, str, delimiter='\t', encoding='utf-8')
+    labels_nums = labels_id.size
     input_images = tf.placeholder(dtype=tf.float32, shape=[None, resize_height, resize_width, depths], name='input')
 
     #其他模型预测请修改这里
@@ -78,29 +80,40 @@ def predict_single_image(models_path,image_path,labels_filename,labels_nums, dat
     # print(labels[pre_sort[0][0]])
     # max_score=pre_score[0,pre_label]
     # print("{} is: pre labels:{},name:{} score: {}".format(image_path,pre_label,labels[pre_label], max_score))
-    result = get_top_result(pre_score, labels)
+    result = get_top_result(pre_score, labels,labels_id)
     print("{} is result : {}".format(image_path, result))
     sess.close()
 
-def get_top_result(pre_score, labels, max_top = 5):
+def get_top_result(pre_score, labels, label_id, max_top = 3, score_threshod = 0.01):
+    '''
+    用于获取结果中预测分数较高的数个结果，返回result是一个dict
+    pre_score：预测的分数
+    labels：预测的标签列表
+    max_top：最多返回几个
+    score_threshod：返回的阈值 大于这个分数就会被返回 小于分数则舍弃
+    '''
     pre_sort = np.argsort(-pre_score)[0]
     result = []
     for i in range(0,max_top):
         top_dict = {}
         top_dict['score'] = pre_score[0][pre_sort[i]]
-        top_dict['labels'] = labels[pre_sort[i]]
-        result.append(top_dict)
+        top_dict['label_name'] = labels[pre_sort[i]]
+        top_dict['label_id'] = label_id[pre_sort[i]]
+        if i == 0 or top_dict['score'] > score_threshod:
+            result.append(top_dict)
     return result
 
 
 if __name__ == '__main__':
 
-    class_nums=50
+    # class_nums=172
     image_dir='test_image'
-    labels_filename='food_mid_dataset/label_map.txt'
+    labels_filename='food_large_dataset/label_map.txt'
+
+    label_id_filename = 'food_large_dataset/label.txt'
     image_path = 'test_image/pic_19.jpg'
     # map_labels_filename='dataset/label.txt'
-    models_path='complete_models/model.ckpt-45000'
+    models_path='complete_models/model.ckpt-60000'
 
     batch_size = 1  #
     resize_height = 224  # 指定存储图片高度
@@ -108,4 +121,4 @@ if __name__ == '__main__':
     depths=3
     data_format=[batch_size,resize_height,resize_width,depths]
     # predict_list_image(models_path,image_dir, labels_filename, class_nums, data_format)
-    predict_single_image(models_path,image_path, labels_filename, class_nums, data_format)
+    predict_single_image(models_path,image_path, labels_filename,label_id_filename, data_format)

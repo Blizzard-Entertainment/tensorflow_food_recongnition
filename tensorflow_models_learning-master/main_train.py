@@ -77,7 +77,6 @@ def step_train(train_op,loss,accuracy,
         # 恢复之前的训练状态  修改下面的判断语句和读入的文件步数即可
         # RESTORE_FROM_CHECKPOINT = True
         if RESTORE_FROM_CHECKPOINT:
-            restore_steps = 20000
             restore_file = './models/model.ckpt-{}'.format(str(restore_steps))
             saver.restore(sess, restore_file)
             print("[INFO]restore from file ", restore_file)
@@ -217,7 +216,7 @@ if __name__ == '__main__':
     val_record_file='{}/record/val224.tfrecords'.format(dataset_file)
 
     train_log_step=200
-    base_lr = 0.001  # 学习率
+    base_lr = 0.000001  # 学习率
     max_steps = 80000  # 迭代次数
     train_param=[base_lr,max_steps]
 
@@ -228,7 +227,7 @@ if __name__ == '__main__':
     # 恢复之前的训练状态  修改下面的判断语句和读入的文件步数即可 
     # 读取 'models/model.ckpt-restore_steps' 文件
     RESTORE_FROM_CHECKPOINT = True
-    restore_steps = 20000
+    restore_steps = 55000
 
     train(train_record_file=train_record_file,
           train_log_step=train_log_step,
