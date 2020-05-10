@@ -1,0 +1,1 @@
+{'0': {'train_acc': 0.0, 'val_loss': 6.659664, 'train_loss': 5.9827952, 'val_acc': 0.00375}}

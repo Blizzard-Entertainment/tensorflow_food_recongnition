@@ -45,7 +45,7 @@ def net_evaluation(sess,loss,accuracy,val_images_batch,val_labels_batch,val_nums
     mean_acc = np.array(val_accs, dtype=np.float32).mean()
     return mean_loss, mean_acc
 
-def step_train(train_op,loss,accuracy,
+def step_train(train_op,loss,accuracy,max_steps,
                train_images_batch,train_labels_batch,train_nums,train_log_step,
                val_images_batch,val_labels_batch,val_nums,val_log_step,
                snapshot_prefix,snapshot,RESTORE_FROM_CHECKPOINT, restore_steps):
@@ -54,6 +54,7 @@ def step_train(train_op,loss,accuracy,
     :param train_op: 训练op
     :param loss:     loss函数
     :param accuracy: 准确率函数
+    :param max_steps: 最大步数
     :param train_images_batch: 训练images数据
     :param train_labels_batch: 训练labels数据
     :param train_nums:         总训练数据
@@ -68,7 +69,7 @@ def step_train(train_op,loss,accuracy,
     '''
     saver = tf.train.Saver()
     max_acc = 0.0
-    # restore_steps = 0
+    init_steps = 0
     with tf.Session() as sess:
 
         sess.run(tf.global_variables_initializer())
@@ -77,6 +78,7 @@ def step_train(train_op,loss,accuracy,
         # 恢复之前的训练状态  修改下面的判断语句和读入的文件步数即可
         # RESTORE_FROM_CHECKPOINT = True
         if RESTORE_FROM_CHECKPOINT:
+            init_steps = restore_steps
             restore_file = './models/model.ckpt-{}'.format(str(restore_steps))
             saver.restore(sess, restore_file)
             print("[INFO]restore from file ", restore_file)
@@ -84,7 +86,7 @@ def step_train(train_op,loss,accuracy,
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
-        for i in range(restore_steps, max_steps + 1):  
+        for i in range(init_steps, max_steps + 1):  
             batch_input_images, batch_input_labels = sess.run([train_images_batch, train_labels_batch])
             _, train_loss = sess.run([train_op, loss], feed_dict={input_images: batch_input_images,
             input_labels: batch_input_labels,
@@ -184,9 +186,11 @@ def train(train_record_file,
     LEARNING_RATE_DECAY = 0.99 # 设置学习衰减率为0.99
     LEARNING_RATE_STEP = 100 # 设置喂入多少轮BATCH_SIZE之后更新一次学习率,一般设置为 总样本数/BATCH_SIZE
 
-    global_steps = tf.Variable(0,trainable = False)
-    # if RESTORE_FROM_CHECKPOINT: 
-    #     global_steps = tf.Variable(restore_steps,trainable = False)
+    global_steps = None
+    if RESTORE_FROM_CHECKPOINT: 
+        global_steps = tf.Variable(restore_steps,trainable = False)
+    else:
+        global_steps = tf.Variable(0,trainable = False)
     learing_rate = tf.train.exponential_decay(LEARNING_RATE_BASE, global_steps,LEARNING_RATE_STEP,LEARNING_RATE_DECAY,staircase=True)             
 
     optimizer = tf.train.AdamOptimizer(learing_rate, 0.9)
@@ -205,15 +209,15 @@ def train(train_record_file,
 
     accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(out, 1), tf.argmax(input_labels, 1)), tf.float32))
 
-    step_train(train_op, loss, accuracy,
+    step_train(train_op, loss, accuracy,max_steps,
                train_images_batch, train_labels_batch, train_nums, train_log_step,
                val_images_batch, val_labels_batch, val_nums, val_log_step,
                snapshot_prefix, snapshot, RESTORE_FROM_CHECKPOINT, restore_steps)
 
-if __name__ == '__main__':
+def main_train():
     dataset_file = 'food_large_dataset'
-    train_record_file='{}/record/train224.tfrecords'.format(dataset_file)
-    val_record_file='{}/record/val224.tfrecords'.format(dataset_file)
+    train_record_file='{}/record/train{}.tfrecords'.format(dataset_file,resize_height)
+    val_record_file='{}/record/val{}.tfrecords'.format(dataset_file,resize_height)
 
     train_log_step=200
     base_lr = 0.000001  # 学习率
@@ -226,8 +230,8 @@ if __name__ == '__main__':
 
     # 恢复之前的训练状态  修改下面的判断语句和读入的文件步数即可 
     # 读取 'models/model.ckpt-restore_steps' 文件
-    RESTORE_FROM_CHECKPOINT = True
-    restore_steps = 55000
+    RESTORE_FROM_CHECKPOINT = False
+    restore_steps = 60000
 
     train(train_record_file=train_record_file,
           train_log_step=train_log_step,
@@ -243,3 +247,39 @@ if __name__ == '__main__':
           )
 
     show_data_from_file()
+
+def test_lr_train():
+    dataset_file = 'food_large_dataset'
+    train_record_file='{}/record/train{}.tfrecords'.format(dataset_file,resize_height)
+    val_record_file='{}/record/val{}.tfrecords'.format(dataset_file,resize_height)
+
+    train_log_step=20
+    base_lr = 0.001 # 学习率
+    max_steps = 2000  # 迭代次数
+    train_param=[base_lr,max_steps]
+
+    val_log_step=train_log_step
+    snapshot=1000#保存文件间隔
+    snapshot_prefix='models/model.ckpt'
+
+    # 恢复之前的训练状态  修改下面的判断语句和读入的文件步数即可 
+    # 读取 'models/model.ckpt-restore_steps' 文件
+    RESTORE_FROM_CHECKPOINT = False
+    restore_steps = 60000
+
+    train(train_record_file=train_record_file,
+          train_log_step=train_log_step,
+          train_param=train_param,
+          val_record_file=val_record_file,
+          val_log_step=val_log_step,
+          labels_nums=labels_nums,
+          data_shape=data_shape,
+          snapshot=snapshot,
+          snapshot_prefix=snapshot_prefix,
+          RESTORE_FROM_CHECKPOINT = RESTORE_FROM_CHECKPOINT,
+          restore_steps = restore_steps
+          )
+
+
+if __name__ == '__main__':
+    test_lr_train()

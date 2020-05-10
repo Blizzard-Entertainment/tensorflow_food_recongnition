@@ -6,6 +6,7 @@ import time
 
 # date_time = str(time.asctime(time.localtime(time.time())).replace(':','-'))
 date_time = 'Mon May  4 00-17-12 2020'
+logfile = 'logs/log_{}.txt'.format(date_time)
 datafile = 'logs/loss_acc_{}.txt'.format(date_time)
 plotFile = 'logs/plot/plot_{}.png'.format(date_time)
 plotaccFile = 'logs/plot/plot_acc_{}.png'.format(date_time)
@@ -72,11 +73,12 @@ def show_data_from_file(filename = datafile):
         for t in label_tuple:
             x.append(t[0])
             y.append(t[1])
+        
 
         plt.plot(x, y, color =lines_color[lines_loss_label.index(label)], label = label)
 
 
-    plt.ylim(0,100)
+    # plt.ylim(0,100)
     plt.xlabel('iteration')
     plt.ylabel('acc/loss')
     plt.legend(loc ='best')
@@ -98,6 +100,7 @@ def write_data_to_file(filename, data):
 def feed_data_to_file(i_step=2, train_loss=0, train_acc=0, val_loss=0, val_acc=0):
     data = generate_data_dict(i_step, train_loss, train_acc, val_loss, val_acc)
     write_data_to_file(datafile, data)
+
 
 if __name__ == '__main__':
     show_data_from_file()

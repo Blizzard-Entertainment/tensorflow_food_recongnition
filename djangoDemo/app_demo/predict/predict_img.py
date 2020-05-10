@@ -71,7 +71,7 @@ def get_top_result(pre_score, labels, label_id, max_top = 3, score_threshod = 0.
         top_dict['label_name'] = str(labels[pre_sort[i]])
         top_dict['label_id'] = str(label_id[pre_sort[i]])
         if i == 0 or pre_score[0][pre_sort[i]] > score_threshod:
-            result [i+1] = top_dict
+            result ["top_{}".format(i+1)] = top_dict
     return result
 
 
