@@ -1,6 +1,6 @@
 from divide_dataset import *
 from create_tf_record import *
-dataset = "food_large_dataset/"
+dataset = "food_large_dataset_aug/"
 
 dataset_dir = dataset + 'dataset'
 train_txt = dataset + 'train.txt' 

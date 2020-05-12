@@ -5,6 +5,8 @@ from app_demo.request_utils.request_response import *
 from app_demo.request_utils.common import *
 from app_demo.models import *
 import json
+import logging
+logger = logging.getLogger('log')
 """
  django.http模块中定义了HttpResponse 对象的API
  作用：不需要调用模板直接返回数据
@@ -21,9 +23,10 @@ request是django.http.HttpRequest的一个实例
 def request_test(request):
     if request.method == 'POST':
         return JsonResponse(query_img_predict(request))
-    return None
+    return JsonResponse(default_post_method_error())
 
 def request_img_predict(request):
+    logger.info("request_img_predict")
     if request.method == 'POST':
         return JsonResponse(query_img_predict(request))
     return JsonResponse(default_post_method_error())

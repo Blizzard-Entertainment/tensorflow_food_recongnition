@@ -4,18 +4,21 @@ import base64
 import os
 import re
 from app_demo.predict.predict_img import *
-
+import logging
+logger = logging.getLogger('log')
+DEFAULT_IMG_NAME = "NoName"
 
 def query_img_predict(request):
     data = request.POST
     if check_param_error(data, 'img_base64'):
         return check_param_error(data, 'img_base64')
-    img_base64 = data['img_base64']
-    img_name = data['img_name']
+    img_base64 = data.get('img_base64')
+    img_name = data.get('img_name',default=DEFAULT_IMG_NAME)
     response = {}
     response['status'] = 200
     response['img_name'] = img_name
     response['predict_result'] = predict_img(img_base64)
+    logger.info(response)
     return response
 
 # def save_img(request):

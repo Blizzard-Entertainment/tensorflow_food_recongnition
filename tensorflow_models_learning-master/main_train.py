@@ -11,7 +11,7 @@ from custom_acc_loss import *
 # 修改这一句以及下面相同名字的类 以使用不同的模型
 import slim.nets.inception_v3 as inception_v3
 print("Tensorflow version:{}".format(tf.__version__))
-labels_nums = 172  # 类别个数
+labels_nums = 5  # 类别个数
 batch_size = 16  #
 resize_height = 224  # 指定存储图片高度
 resize_width = 224  # 指定存储图片宽度
@@ -155,11 +155,11 @@ def train(train_record_file,
 
     # 获得训练和测试的样本数
     # 运行过一遍可以直接拿数据跑 不需要再从tfrecord读
-    # train_nums=get_example_nums(train_record_file)
-    # val_nums=get_example_nums(val_record_file)
+    train_nums=get_example_nums(train_record_file)
+    val_nums=get_example_nums(val_record_file)
     # train nums:77268,val nums:32973
-    train_nums = 77268
-    val_nums = 32973
+    # train_nums = 77268
+    # val_nums = 32973
     print('train nums:%d,val nums:%d'%(train_nums,val_nums))
 
     # 从record中读取图片和labels数据
@@ -193,7 +193,8 @@ def train(train_record_file,
         global_steps = tf.Variable(0,trainable = False)
     learing_rate = tf.train.exponential_decay(LEARNING_RATE_BASE, global_steps,LEARNING_RATE_STEP,LEARNING_RATE_DECAY,staircase=True)             
 
-    optimizer = tf.train.AdamOptimizer(learing_rate, 0.9)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=base_lr)
+    # optimizer = tf.train.AdamOptimizer(learing_rate, 0.9)
     # train_op = slim.learning.create_train_op(loss, optimizer,global_step=global_steps)
 
 
@@ -249,13 +250,14 @@ def main_train():
     show_data_from_file()
 
 def test_lr_train():
-    dataset_file = 'food_large_dataset'
+    dataset_file = 'food_little_dataset'
     train_record_file='{}/record/train{}.tfrecords'.format(dataset_file,resize_height)
     val_record_file='{}/record/val{}.tfrecords'.format(dataset_file,resize_height)
 
-    train_log_step=20
-    base_lr = 0.001 # 学习率
-    max_steps = 2000  # 迭代次数
+    labels_nums = 5  # 类别个数
+    train_log_step=200
+    base_lr = 1e-5 # 学习率
+    max_steps = 20000  # 迭代次数
     train_param=[base_lr,max_steps]
 
     val_log_step=train_log_step

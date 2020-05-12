@@ -66,7 +66,7 @@ def get_files_list(dir, label_list):
 if __name__ == '__main__':
 
 
-    dataset = "food_large_dataset/"
+    dataset = "food_large_dataset_aug/"
 
     dataset_dir = dataset + 'dataset'
     train_txt = dataset + 'train.txt' 
