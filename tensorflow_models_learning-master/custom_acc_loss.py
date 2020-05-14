@@ -4,8 +4,13 @@ import numpy as np
 import json
 import time
 
-date_time = str(time.asctime(time.localtime(time.time())).replace(':','-'))
-# date_time = 'Mon May  4 00-17-12 2020'
+# date_time = str(time.asctime(time.localtime(time.time())).replace(':','-'))
+# 目前服务器部署的172类数据集
+# date_time = 'Mon May  4 00-17-12 2020'  
+# 1e-4 adam优化器
+# date_time = 'Tue May 12 23-48-12 2020'  
+# 1e-3 adam优化器
+date_time = 'Mon May 11 00-38-34 2020'  
 logfile = 'logs/log_{}.txt'.format(date_time)
 datafile = 'logs/loss_acc_{}.txt'.format(date_time)
 plotFile = 'logs/plot/plot_{}.png'.format(date_time)

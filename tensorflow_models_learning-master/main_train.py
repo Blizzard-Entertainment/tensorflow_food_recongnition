@@ -172,7 +172,7 @@ def train(train_record_file,
 
     # Define the model:
     with slim.arg_scope(inception_v3.inception_v3_arg_scope()):
-        out, end_points = inception_v3.inception_v3(inputs=input_images, num_classes=labels_nums, dropout_keep_prob=keep_prob, is_training=is_training)
+        out, end_points = inception_v3.inception_v3(inputs=input_images, num_classes=labels_nums,dropout_keep_prob=keep_prob,  is_training=is_training)
 
     # Specify the loss function: tf.losses定义的loss函数都会自动添加到loss函数,不需要add_loss()了
     tf.losses.softmax_cross_entropy(onehot_labels=input_labels, logits=out)#添加交叉熵损失loss=1.6
@@ -193,8 +193,8 @@ def train(train_record_file,
         global_steps = tf.Variable(0,trainable = False)
     learing_rate = tf.train.exponential_decay(LEARNING_RATE_BASE, global_steps,LEARNING_RATE_STEP,LEARNING_RATE_DECAY,staircase=True)             
 
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate=base_lr)
-    # optimizer = tf.train.AdamOptimizer(learing_rate, 0.9)
+    # optimizer = tf.train.GradientDescentOptimizer(learning_rate=base_lr)
+    optimizer = tf.train.AdamOptimizer(learing_rate, 0.9)
     # train_op = slim.learning.create_train_op(loss, optimizer,global_step=global_steps)
 
 
@@ -256,7 +256,7 @@ def test_lr_train():
 
     labels_nums = 5  # 类别个数
     train_log_step=200
-    base_lr = 1e-5 # 学习率
+    base_lr = 1e-3 # 学习率
     max_steps = 20000  # 迭代次数
     train_param=[base_lr,max_steps]
 
